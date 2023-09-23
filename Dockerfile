@@ -4,7 +4,7 @@ RUN mkdir -p /app
 
 
 # Copy the rest of the application code to the container
-COPY emaww.js package.json /app/
+COPY emaww.js package.json config.xml /app/
 
 # Set the working directory in the container
 WORKDIR /app
@@ -13,7 +13,7 @@ WORKDIR /app
 RUN npm install
 
 # Expose the port your Node.js app will listen on
-EXPOSE 8080
+EXPOSE 6379
 
 # Define the command to start your Node.js app
 CMD node emaww.js

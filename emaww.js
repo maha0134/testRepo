@@ -1,5 +1,5 @@
 const redis = require("redis");
-
+let finalKeys = {};
 function createRedisKeys() {
   const fs = require("fs");
   //Node package at https://www.npmjs.com/package/xml2json
@@ -35,10 +35,10 @@ function createRedisKeys() {
       return { [redisKey]: value };
     });
     //using reduce to collect each object and using the initial value of subDomain object to add onto it
-    const finalKeys = cookiesKey.reduce((acc, cookie) => {
+    finalKeys = cookiesKey.reduce((acc, cookie) => {
       return { ...acc, ...cookie };
     }, subDomain);
-    console.log(finalKeys);
+    setUpRedis();
   });
 }
 async function setUpRedis() {
@@ -50,9 +50,14 @@ async function setUpRedis() {
 
   await client.connect();
 
-  await client.set("key", "value");
-  const value = await client.get("key");
-  console.log(value);
+  for (const key in finalKeys) {
+    const value = finalKeys[key];
+    await client.set(key, JSON.stringify(value));
+  }
+  const subDomains = await client.get("subdomains");
+  console.log("subdomains: ", subDomains);
+  const cookie = await client.get("cookie:dlp-avast:forest");
+  console.log(cookie); //mmm_for_dlp_777_ppc_m
 }
-setUpRedis();
+
 createRedisKeys();
